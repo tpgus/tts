@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#6366f1" />
+  <link rel="manifest" href="manifest.json" />
+  <title>나만의 TTS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f13;
+      color: #e2e8f0;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #1a1a2e;
+      padding: 16px 20px;
+      border-bottom: 1px solid #2d2d44;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #a5b4fc;
+    }
+
+    header span { font-size: 1.3rem; }
+
+    main {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #1a1a2e;
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid #2d2d44;
+    }
+
+    .label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7c83a0;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      background: #0f0f1a;
+      border: 1px solid #2d2d44;
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      line-height: 1.6;
+      padding: 12px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { border-color: #6366f1; }
+    textarea::placeholder { color: #4a4a6a; }
+
+    .textarea-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: 9px;
+      border: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(0.96); }
+
+    .btn-ghost {
+      background: #2d2d44;
+      color: #a5b4fc;
+    }
+
+    .btn-ghost:hover { background: #3a3a58; }
+
+    .btn-danger {
+      background: #3d1a1a;
+      color: #f87171;
+    }
+
+    .btn-danger:hover { background: #4d2020; }
+
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+    /* 진행 바 */
+    .progress-wrap {
+      background: #0f0f1a;
+      border-radius: 8px;
+      height: 6px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      border-radius: 8px;
+      transition: width 0.3s;
+    }
+
+    /* 현재 읽는 문장 */
+    #current-sentence {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      min-height: 40px;
+      line-height: 1.5;
+      padding: 8px 10px;
+      background: #0f0f1a;
+      border-radius: 8px;
+      border-left: 3px solid #6366f1;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    /* 재생 컨트롤 */
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-play {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      font-size: 1rem;
+      padding: 12px 28px;
+      border-radius: 50px;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+    }
+
+    .btn-play:hover { opacity: 0.9; }
+
+    .btn-play:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-stop {
+      background: #2d2d44;
+      color: #e2e8f0;
+      padding: 12px 20px;
+      border-radius: 50px;
+    }
+
+    /* 슬라이더 공통 */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slider-row span {
+      font-size: 0.8rem;
+      color: #7c83a0;
+      min-width: 38px;
+      text-align: right;
+    }
+
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 4px;
+      background: #2d2d44;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #6366f1;
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+    }
+
+    /* 음성 선택 */
+    select {
+      width: 100%;
+      background: #0f0f1a;
+      border: 1px solid #2d2d44;
+      color: #e2e8f0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    select:focus { border-color: #6366f1; }
+
+    /* 상태 뱃지 */
+    #status-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: #2d2d44;
+      color: #7c83a0;
+      margin-left: auto;
+    }
+
+    #status-badge.playing {
+      background: rgba(99,102,241,0.2);
+      color: #a5b4fc;
+    }
+
+    #status-badge.paused {
+      background: rgba(251,191,36,0.15);
+      color: #fbbf24;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .char-count {
+      font-size: 0.75rem;
+      color: #4a4a6a;
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    /* PWA 설치 배너 */
+    #install-banner {
+      display: none;
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      border: 1px solid #4338ca;
+      border-radius: 14px;
+      padding: 14px 16px;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #install-banner p {
+      flex: 1;
+      font-size: 0.85rem;
+      color: #c7d2fe;
+      line-height: 1.4;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: #1a1a2e;
+      border: 1px solid #4a4a6a;
+      color: #e2e8f0;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      transition: transform 0.3s;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<header>
+  <span>🎧</span>
+  <h1>나만의 TTS</h1>
+  <div id="status-badge" style="margin-left:auto">대기 중</div>
+</header>
+
+<main>
+
+  <!-- PWA 설치 배너 -->
+  <div id="install-banner">
+    <p>📱 홈 화면에 추가하면 앱처럼 사용할 수 있어요!</p>
+    <button class="btn btn-ghost btn-sm" id="install-btn">설치</button>
+    <button class="btn btn-sm" style="background:transparent;color:#4a4a6a" id="dismiss-btn">✕</button>
+  </div>
+
+  <!-- 텍스트 입력 -->
+  <div class="card">
+    <div class="label">학습 내용 입력</div>
+    <textarea id="text-input" placeholder="여기에 학습한 내용을 붙여넣거나 입력하세요..."></textarea>
+    <div class="char-count"><span id="char-count">0</span>자</div>
+    <div class="textarea-actions">
+      <button class="btn btn-ghost btn-sm" id="paste-btn">📋 붙여넣기</button>
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+        📂 파일 열기
+        <input type="file" id="file-input" accept=".txt,.md" style="display:none" />
+      </label>
+      <button class="btn btn-danger btn-sm" id="clear-btn">🗑 지우기</button>
+    </div>
+  </div>
+
+  <!-- 재생 상태 -->
+  <div class="card" id="player-card">
+    <div class="header-row" style="margin-bottom:12px">
+      <div class="label" style="margin:0">재생</div>
+    </div>
+    <div class="progress-wrap">
+      <div id="progress-bar"></div>
+    </div>
+    <div id="current-sentence"></div>
+    <div class="controls">
+      <button class="btn btn-play" id="play-btn">▶ 재생</button>
+      <button class="btn btn-stop" id="pause-btn" disabled>⏸ 일시정지</button>
+      <button class="btn btn-stop" id="stop-btn" disabled>⏹ 정지</button>
+    </div>
+  </div>
+
+  <!-- 설정 -->
+  <div class="card">
+    <div class="label">음성 설정</div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:0.8rem;color:#7c83a0;margin-bottom:6px">음성</div>
+      <select id="voice-select"><option>음성 로딩 중...</option></select>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:0.8rem;color:#7c83a0;margin-bottom:8px">재생 속도</div>
+      <div class="slider-row">
+        <span>0.5×</span>
+        <input type="range" id="rate-slider" min="0.5" max="2" step="0.1" value="1" />
+        <span id="rate-label">1.0×</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:0.8rem;color:#7c83a0;margin-bottom:8px">음높이</div>
+      <div class="slider-row">
+        <span>낮음</span>
+        <input type="range" id="pitch-slider" min="0.5" max="2" step="0.1" value="1" />
+        <span id="pitch-label">1.0</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── 요소 ──────────────────────────────────────────
+  const textInput     = document.getElementById('text-input');
+  const charCount     = document.getElementById('char-count');
+  const pasteBtn      = document.getElementById('paste-btn');
+  const clearBtn      = document.getElementById('clear-btn');
+  const playBtn       = document.getElementById('play-btn');
+  const pauseBtn      = document.getElementById('pause-btn');
+  const stopBtn       = document.getElementById('stop-btn');
+  const voiceSelect   = document.getElementById('voice-select');
+  const rateSlider    = document.getElementById('rate-slider');
+  const rateLabel     = document.getElementById('rate-label');
+  const pitchSlider   = document.getElementById('pitch-slider');
+  const pitchLabel    = document.getElementById('pitch-label');
+  const progressBar   = document.getElementById('progress-bar');
+  const currentSent   = document.getElementById('current-sentence');
+  const statusBadge   = document.getElementById('status-badge');
+  const toast         = document.getElementById('toast');
+
+  // ── 상태 ──────────────────────────────────────────
+  let sentences = [];
+  let idx = 0;
+  let isPaused = false;
+  let utterance = null;
+
+  // ── 유틸 ──────────────────────────────────────────
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  function setStatus(s) {
+    statusBadge.className = '';
+    statusBadge.classList.add(s);
+    const map = { playing: '▶ 재생 중', paused: '⏸ 일시정지', '': '대기 중' };
+    statusBadge.textContent = map[s] ?? '대기 중';
+  }
+
+  function updateProgress() {
+    const pct = sentences.length ? (idx / sentences.length) * 100 : 0;
+    progressBar.style.width = pct + '%';
+  }
+
+  // ── 텍스트 ────────────────────────────────────────
+  textInput.addEventListener('input', () => {
+    charCount.textContent = textInput.value.length;
+  });
+
+  pasteBtn.addEventListener('click', async () => {
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      try {
+        const text = await navigator.clipboard.readText();
+        textInput.value = text;
+        charCount.textContent = text.length;
+        showToast('붙여넣기 완료!');
+        return;
+      } catch {}
+    }
+    // HTTP 환경(모바일 로컬) 폴백: 텍스트 영역 포커스 후 안내
+    textInput.focus();
+    showToast('텍스트 영역을 길게 눌러 붙여넣기 하세요');
+  });
+
+  document.getElementById('file-input').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      textInput.value = ev.target.result;
+      charCount.textContent = ev.target.result.length;
+      showToast(`"${file.name}" 불러왔어요!`);
+    };
+    reader.readAsText(file, 'UTF-8');
+    e.target.value = '';
+  });
+
+  clearBtn.addEventListener('click', () => {
+    if (!textInput.value) return;
+    synth.cancel();
+    textInput.value = '';
+    charCount.textContent = 0;
+    resetPlayer();
+    showToast('지웠어요.');
+  });
+
+  // ── 음성 ──────────────────────────────────────────
+  const synth = window.speechSynthesis;
+  let voices = [];
+
+  function loadVoices() {
+    voices = synth.getVoices();
+    if (!voices.length) return;
+    voiceSelect.innerHTML = '';
+
+    // 한국어 우선, 그다음 전체
+    const ko = voices.filter(v => v.lang.startsWith('ko'));
+    const others = voices.filter(v => !v.lang.startsWith('ko'));
+    const sorted = [...ko, ...others];
+
+    sorted.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${v.name} (${v.lang})`;
+      opt.dataset.idx = voices.indexOf(v);
+      voiceSelect.appendChild(opt);
+    });
+  }
+
+  synth.addEventListener('voiceschanged', loadVoices);
+  loadVoices();
+
+  rateSlider.addEventListener('input', () => {
+    rateLabel.textContent = parseFloat(rateSlider.value).toFixed(1) + '×';
+  });
+
+  pitchSlider.addEventListener('input', () => {
+    pitchLabel.textContent = parseFloat(pitchSlider.value).toFixed(1);
+  });
+
+  // ── 재생 ──────────────────────────────────────────
+  function splitSentences(text) {
+    // 문장 단위로 분리 (마침표/줄바꿈 기준)
+    return text
+      .split(/(?<=[.!?])\s+|[\n]+/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+  }
+
+  function getSelectedVoice() {
+    const opt = voiceSelect.selectedOptions[0];
+    if (!opt) return null;
+    return voices[parseInt(opt.dataset.idx)];
+  }
+
+  function speakNext() {
+    if (idx >= sentences.length) {
+      resetPlayer();
+      showToast('재생 완료!');
+      return;
+    }
+
+    const text = sentences[idx];
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = getSelectedVoice();
+    utterance.rate  = parseFloat(rateSlider.value);
+    utterance.pitch = parseFloat(pitchSlider.value);
+    utterance.lang  = utterance.voice?.lang ?? 'ko-KR';
+
+    currentSent.style.display = 'block';
+    currentSent.textContent = text;
+    updateProgress();
+
+    utterance.onend = () => {
+      if (!isPaused) { idx++; speakNext(); }
+    };
+
+    utterance.onerror = (e) => {
+      if (e.error === 'interrupted') return;
+      showToast('오류: ' + e.error);
+      resetPlayer();
+    };
+
+    synth.speak(utterance);
+  }
+
+  playBtn.addEventListener('click', () => {
+    const text = textInput.value.trim();
+    if (!text) { showToast('텍스트를 먼저 입력해주세요!'); return; }
+
+    if (isPaused) {
+      isPaused = false;
+      synth.resume();
+      setStatus('playing');
+      pauseBtn.textContent = '⏸ 일시정지';
+      pauseBtn.disabled = false;
+      return;
+    }
+
+    sentences = splitSentences(text);
+    idx = 0;
+    isPaused = false;
+    synth.cancel();
+
+    playBtn.disabled = true;
+    pauseBtn.disabled = false;
+    stopBtn.disabled = false;
+    setStatus('playing');
+
+    speakNext();
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    if (synth.speaking && !synth.paused) {
+      synth.pause();
+      isPaused = true;
+      setStatus('paused');
+      pauseBtn.textContent = '▶ 계속';
+      playBtn.disabled = false;
+    } else if (synth.paused) {
+      synth.resume();
+      isPaused = false;
+      setStatus('playing');
+      pauseBtn.textContent = '⏸ 일시정지';
+      playBtn.disabled = true;
+    }
+  });
+
+  stopBtn.addEventListener('click', () => {
+    synth.cancel();
+    resetPlayer();
+  });
+
+  function resetPlayer() {
+    synth.cancel();
+    sentences = [];
+    idx = 0;
+    isPaused = false;
+    utterance = null;
+    playBtn.disabled = false;
+    pauseBtn.disabled = true;
+    pauseBtn.textContent = '⏸ 일시정지';
+    stopBtn.disabled = true;
+    progressBar.style.width = '0%';
+    currentSent.style.display = 'none';
+    currentSent.textContent = '';
+    setStatus('');
+  }
+
+  // ── PWA 설치 ──────────────────────────────────────
+  let deferredPrompt;
+  const installBanner = document.getElementById('install-banner');
+  const installBtn    = document.getElementById('install-btn');
+  const dismissBtn    = document.getElementById('dismiss-btn');
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBanner.style.display = 'flex';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') showToast('앱으로 설치했어요!');
+    deferredPrompt = null;
+    installBanner.style.display = 'none';
+  });
+
+  dismissBtn.addEventListener('click', () => {
+    installBanner.style.display = 'none';
+  });
+
+  // ── Service Worker ─────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
