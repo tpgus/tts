@@ -27,12 +27,7 @@
       gap: 10px;
     }
 
-    header h1 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #a5b4fc;
-    }
-
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #a5b4fc; }
     header span { font-size: 1.3rem; }
 
     main {
@@ -84,6 +79,7 @@
       display: flex;
       gap: 8px;
       margin-top: 8px;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -101,22 +97,25 @@
     }
 
     .btn:active { transform: scale(0.96); }
-
-    .btn-ghost {
-      background: #2d2d44;
-      color: #a5b4fc;
-    }
-
+    .btn-ghost { background: #2d2d44; color: #a5b4fc; }
     .btn-ghost:hover { background: #3a3a58; }
+    .btn-danger { background: #3d1a1a; color: #f87171; }
+    .btn-danger:hover { background: #4d2020; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
 
-    .btn-danger {
-      background: #3d1a1a;
-      color: #f87171;
+    /* 이어서 재생 배너 */
+    #resume-banner {
+      display: none;
+      background: linear-gradient(135deg, #1a2e1a, #1e3a1e);
+      border: 1px solid #2d5a2d;
+      border-radius: 14px;
+      padding: 14px 16px;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
     }
 
-    .btn-danger:hover { background: #4d2020; }
-
-    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+    #resume-banner p { flex: 1; font-size: 0.85rem; color: #86efac; line-height: 1.4; }
 
     /* 진행 바 */
     .progress-wrap {
@@ -167,11 +166,7 @@
     }
 
     .btn-play:hover { opacity: 0.9; }
-
-    .btn-play:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+    .btn-play:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-stop {
       background: #2d2d44;
@@ -180,19 +175,73 @@
       border-radius: 50px;
     }
 
-    /* 슬라이더 공통 */
-    .slider-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    /* 문장 목록 */
+    #sentence-list-wrap {
+      display: none;
     }
 
-    .slider-row span {
-      font-size: 0.8rem;
-      color: #7c83a0;
-      min-width: 38px;
-      text-align: right;
+    #sentence-list-toggle {
+      width: 100%;
+      background: #2d2d44;
+      color: #a5b4fc;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
     }
+
+    #sentence-list {
+      max-height: 260px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sentence-item {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      cursor: pointer;
+      border: 1px solid transparent;
+      line-height: 1.4;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      transition: background 0.1s;
+    }
+
+    .sentence-item:hover { background: #2d2d44; }
+
+    .sentence-item.active {
+      background: rgba(99,102,241,0.15);
+      border-color: #6366f1;
+      color: #c7d2fe;
+    }
+
+    .sentence-item.done { color: #4a4a6a; }
+
+    .sent-num {
+      font-size: 0.7rem;
+      color: #4a4a6a;
+      min-width: 22px;
+      padding-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sentence-item.active .sent-num { color: #6366f1; }
+
+    /* 슬라이더 */
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .slider-row span { font-size: 0.8rem; color: #7c83a0; min-width: 38px; text-align: right; }
 
     input[type=range] {
       flex: 1;
@@ -213,7 +262,6 @@
       box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
     }
 
-    /* 음성 선택 */
     select {
       width: 100%;
       background: #0f0f1a;
@@ -227,7 +275,6 @@
 
     select:focus { border-color: #6366f1; }
 
-    /* 상태 뱃지 */
     #status-badge {
       display: inline-block;
       font-size: 0.75rem;
@@ -239,29 +286,11 @@
       margin-left: auto;
     }
 
-    #status-badge.playing {
-      background: rgba(99,102,241,0.2);
-      color: #a5b4fc;
-    }
+    #status-badge.playing { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+    #status-badge.paused  { background: rgba(251,191,36,0.15); color: #fbbf24; }
 
-    #status-badge.paused {
-      background: rgba(251,191,36,0.15);
-      color: #fbbf24;
-    }
+    .char-count { font-size: 0.75rem; color: #4a4a6a; text-align: right; margin-top: 4px; }
 
-    .header-row {
-      display: flex;
-      align-items: center;
-    }
-
-    .char-count {
-      font-size: 0.75rem;
-      color: #4a4a6a;
-      text-align: right;
-      margin-top: 4px;
-    }
-
-    /* PWA 설치 배너 */
     #install-banner {
       display: none;
       background: linear-gradient(135deg, #1e1b4b, #312e81);
@@ -273,12 +302,7 @@
       gap: 12px;
     }
 
-    #install-banner p {
-      flex: 1;
-      font-size: 0.85rem;
-      color: #c7d2fe;
-      line-height: 1.4;
-    }
+    #install-banner p { flex: 1; font-size: 0.85rem; color: #c7d2fe; line-height: 1.4; }
 
     .toast {
       position: fixed;
@@ -316,6 +340,13 @@
     <button class="btn btn-sm" style="background:transparent;color:#4a4a6a" id="dismiss-btn">✕</button>
   </div>
 
+  <!-- 이어서 재생 배너 -->
+  <div id="resume-banner">
+    <p id="resume-text">이전에 듣던 곳부터 이어서 재생할까요?</p>
+    <button class="btn btn-ghost btn-sm" id="resume-btn">이어서 재생</button>
+    <button class="btn btn-sm" style="background:transparent;color:#4a4a6a" id="resume-dismiss">처음부터</button>
+  </div>
+
   <!-- 텍스트 입력 -->
   <div class="card">
     <div class="label">학습 내용 입력</div>
@@ -331,10 +362,11 @@
     </div>
   </div>
 
-  <!-- 재생 상태 -->
-  <div class="card" id="player-card">
-    <div class="header-row" style="margin-bottom:12px">
+  <!-- 재생 -->
+  <div class="card">
+    <div style="display:flex;align-items:center;margin-bottom:12px">
       <div class="label" style="margin:0">재생</div>
+      <span id="idx-label" style="font-size:0.75rem;color:#4a4a6a;margin-left:auto"></span>
     </div>
     <div class="progress-wrap">
       <div id="progress-bar"></div>
@@ -345,6 +377,15 @@
       <button class="btn btn-stop" id="pause-btn" disabled>⏸ 일시정지</button>
       <button class="btn btn-stop" id="stop-btn" disabled>⏹ 정지</button>
     </div>
+  </div>
+
+  <!-- 문장 목록 -->
+  <div class="card" id="sentence-list-wrap">
+    <button id="sentence-list-toggle">
+      <span>문장 목록에서 시작 지점 선택</span>
+      <span id="toggle-arrow">▼</span>
+    </button>
+    <div id="sentence-list"></div>
   </div>
 
   <!-- 설정 -->
@@ -380,29 +421,35 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── 요소 ──────────────────────────────────────────
-  const textInput     = document.getElementById('text-input');
-  const charCount     = document.getElementById('char-count');
-  const pasteBtn      = document.getElementById('paste-btn');
-  const clearBtn      = document.getElementById('clear-btn');
-  const playBtn       = document.getElementById('play-btn');
-  const pauseBtn      = document.getElementById('pause-btn');
-  const stopBtn       = document.getElementById('stop-btn');
-  const voiceSelect   = document.getElementById('voice-select');
-  const rateSlider    = document.getElementById('rate-slider');
-  const rateLabel     = document.getElementById('rate-label');
-  const pitchSlider   = document.getElementById('pitch-slider');
-  const pitchLabel    = document.getElementById('pitch-label');
-  const progressBar   = document.getElementById('progress-bar');
-  const currentSent   = document.getElementById('current-sentence');
-  const statusBadge   = document.getElementById('status-badge');
-  const toast         = document.getElementById('toast');
+  const textInput   = document.getElementById('text-input');
+  const charCount   = document.getElementById('char-count');
+  const pasteBtn    = document.getElementById('paste-btn');
+  const clearBtn    = document.getElementById('clear-btn');
+  const playBtn     = document.getElementById('play-btn');
+  const pauseBtn    = document.getElementById('pause-btn');
+  const stopBtn     = document.getElementById('stop-btn');
+  const voiceSelect = document.getElementById('voice-select');
+  const rateSlider  = document.getElementById('rate-slider');
+  const rateLabel   = document.getElementById('rate-label');
+  const pitchSlider = document.getElementById('pitch-slider');
+  const pitchLabel  = document.getElementById('pitch-label');
+  const progressBar = document.getElementById('progress-bar');
+  const currentSent = document.getElementById('current-sentence');
+  const statusBadge = document.getElementById('status-badge');
+  const toast       = document.getElementById('toast');
+  const idxLabel    = document.getElementById('idx-label');
+  const sentListWrap   = document.getElementById('sentence-list-wrap');
+  const sentListEl     = document.getElementById('sentence-list');
+  const sentListToggle = document.getElementById('sentence-list-toggle');
+  const toggleArrow    = document.getElementById('toggle-arrow');
 
-  // ── 상태 ──────────────────────────────────────────
+  const synth = window.speechSynthesis;
+  let voices = [];
   let sentences = [];
   let idx = 0;
   let isPaused = false;
   let utterance = null;
+  let listOpen = false;
 
   // ── 유틸 ──────────────────────────────────────────
   function showToast(msg) {
@@ -413,32 +460,74 @@
 
   function setStatus(s) {
     statusBadge.className = '';
-    statusBadge.classList.add(s);
-    const map = { playing: '▶ 재생 중', paused: '⏸ 일시정지', '': '대기 중' };
+    if (s) statusBadge.classList.add(s);
+    const map = { playing: '▶ 재생 중', paused: '⏸ 일시정지' };
     statusBadge.textContent = map[s] ?? '대기 중';
   }
 
   function updateProgress() {
     const pct = sentences.length ? (idx / sentences.length) * 100 : 0;
     progressBar.style.width = pct + '%';
+    idxLabel.textContent = sentences.length ? `${idx + 1} / ${sentences.length}` : '';
+    highlightSentenceItem();
+    saveProgress();
+  }
+
+  // ── localStorage ──────────────────────────────────
+  function saveProgress() {
+    localStorage.setItem('tts_text', textInput.value);
+    localStorage.setItem('tts_idx', idx);
+  }
+
+  function loadSaved() {
+    const savedText = localStorage.getItem('tts_text');
+    const savedIdx  = parseInt(localStorage.getItem('tts_idx') ?? '0');
+    if (!savedText) return;
+
+    textInput.value = savedText;
+    charCount.textContent = savedText.length;
+
+    const sents = splitSentences(savedText);
+    if (savedIdx > 0 && savedIdx < sents.length) {
+      const banner = document.getElementById('resume-banner');
+      const resumeText = document.getElementById('resume-text');
+      resumeText.textContent = `${savedIdx + 1}번째 문장부터 이어서 재생할까요?`;
+      banner.style.display = 'flex';
+
+      document.getElementById('resume-btn').onclick = () => {
+        banner.style.display = 'none';
+        startFrom(sents, savedIdx);
+      };
+      document.getElementById('resume-dismiss').onclick = () => {
+        banner.style.display = 'none';
+        localStorage.setItem('tts_idx', 0);
+        buildSentenceList(sents);
+      };
+    } else {
+      buildSentenceList(sents);
+    }
   }
 
   // ── 텍스트 ────────────────────────────────────────
   textInput.addEventListener('input', () => {
     charCount.textContent = textInput.value.length;
+    saveProgress();
+    const sents = splitSentences(textInput.value);
+    buildSentenceList(sents);
   });
 
   pasteBtn.addEventListener('click', async () => {
-    if (navigator.clipboard && navigator.clipboard.readText) {
+    if (navigator.clipboard?.readText) {
       try {
         const text = await navigator.clipboard.readText();
         textInput.value = text;
         charCount.textContent = text.length;
+        saveProgress();
+        buildSentenceList(splitSentences(text));
         showToast('붙여넣기 완료!');
         return;
       } catch {}
     }
-    // HTTP 환경(모바일 로컬) 폴백: 텍스트 영역 포커스 후 안내
     textInput.focus();
     showToast('텍스트 영역을 길게 눌러 붙여넣기 하세요');
   });
@@ -450,6 +539,8 @@
     reader.onload = (ev) => {
       textInput.value = ev.target.result;
       charCount.textContent = ev.target.result.length;
+      saveProgress();
+      buildSentenceList(splitSentences(ev.target.result));
       showToast(`"${file.name}" 불러왔어요!`);
     };
     reader.readAsText(file, 'UTF-8');
@@ -461,27 +552,22 @@
     synth.cancel();
     textInput.value = '';
     charCount.textContent = 0;
+    localStorage.removeItem('tts_text');
+    localStorage.removeItem('tts_idx');
     resetPlayer();
+    buildSentenceList([]);
     showToast('지웠어요.');
   });
 
   // ── 음성 ──────────────────────────────────────────
-  const synth = window.speechSynthesis;
-  let voices = [];
-
   function loadVoices() {
     voices = synth.getVoices();
     if (!voices.length) return;
     voiceSelect.innerHTML = '';
-
-    // 한국어 우선, 그다음 전체
     const ko = voices.filter(v => v.lang.startsWith('ko'));
     const others = voices.filter(v => !v.lang.startsWith('ko'));
-    const sorted = [...ko, ...others];
-
-    sorted.forEach((v, i) => {
+    [...ko, ...others].forEach(v => {
       const opt = document.createElement('option');
-      opt.value = i;
       opt.textContent = `${v.name} (${v.lang})`;
       opt.dataset.idx = voices.indexOf(v);
       voiceSelect.appendChild(opt);
@@ -499,19 +585,55 @@
     pitchLabel.textContent = parseFloat(pitchSlider.value).toFixed(1);
   });
 
-  // ── 재생 ──────────────────────────────────────────
+  // ── 문장 목록 ──────────────────────────────────────
   function splitSentences(text) {
-    // 문장 단위로 분리 (마침표/줄바꿈 기준)
     return text
       .split(/(?<=[.!?])\s+|[\n]+/)
       .map(s => s.trim())
       .filter(s => s.length > 0);
   }
 
+  function buildSentenceList(sents) {
+    if (!sents.length) {
+      sentListWrap.style.display = 'none';
+      sentListEl.innerHTML = '';
+      return;
+    }
+    sentListWrap.style.display = 'block';
+    sentListEl.innerHTML = '';
+    sents.forEach((s, i) => {
+      const div = document.createElement('div');
+      div.className = 'sentence-item';
+      div.dataset.i = i;
+      div.innerHTML = `<span class="sent-num">${i + 1}</span><span>${s}</span>`;
+      div.addEventListener('click', () => {
+        synth.cancel();
+        startFrom(sents, i);
+        showToast(`${i + 1}번째 문장부터 재생`);
+      });
+      sentListEl.appendChild(div);
+    });
+  }
+
+  function highlightSentenceItem() {
+    sentListEl.querySelectorAll('.sentence-item').forEach((el, i) => {
+      el.classList.toggle('active', i === idx);
+      el.classList.toggle('done', i < idx);
+    });
+    const active = sentListEl.querySelector('.sentence-item.active');
+    if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  sentListToggle.addEventListener('click', () => {
+    listOpen = !listOpen;
+    sentListEl.style.display = listOpen ? 'flex' : 'none';
+    toggleArrow.textContent = listOpen ? '▲' : '▼';
+  });
+
+  // ── 재생 ──────────────────────────────────────────
   function getSelectedVoice() {
     const opt = voiceSelect.selectedOptions[0];
-    if (!opt) return null;
-    return voices[parseInt(opt.dataset.idx)];
+    return opt ? voices[parseInt(opt.dataset.idx)] : null;
   }
 
   function speakNext() {
@@ -532,10 +654,7 @@
     currentSent.textContent = text;
     updateProgress();
 
-    utterance.onend = () => {
-      if (!isPaused) { idx++; speakNext(); }
-    };
-
+    utterance.onend = () => { if (!isPaused) { idx++; speakNext(); } };
     utterance.onerror = (e) => {
       if (e.error === 'interrupted') return;
       showToast('오류: ' + e.error);
@@ -543,6 +662,18 @@
     };
 
     synth.speak(utterance);
+  }
+
+  function startFrom(sents, startIdx) {
+    sentences = sents;
+    idx = startIdx;
+    isPaused = false;
+    playBtn.disabled = true;
+    pauseBtn.disabled = false;
+    pauseBtn.textContent = '⏸ 일시정지';
+    stopBtn.disabled = false;
+    setStatus('playing');
+    speakNext();
   }
 
   playBtn.addEventListener('click', () => {
@@ -555,20 +686,12 @@
       setStatus('playing');
       pauseBtn.textContent = '⏸ 일시정지';
       pauseBtn.disabled = false;
+      playBtn.disabled = true;
       return;
     }
 
-    sentences = splitSentences(text);
-    idx = 0;
-    isPaused = false;
     synth.cancel();
-
-    playBtn.disabled = true;
-    pauseBtn.disabled = false;
-    stopBtn.disabled = false;
-    setStatus('playing');
-
-    speakNext();
+    startFrom(splitSentences(text), 0);
   });
 
   pauseBtn.addEventListener('click', () => {
@@ -603,16 +726,17 @@
     pauseBtn.textContent = '⏸ 일시정지';
     stopBtn.disabled = true;
     progressBar.style.width = '0%';
+    idxLabel.textContent = '';
     currentSent.style.display = 'none';
     currentSent.textContent = '';
     setStatus('');
+    highlightSentenceItem();
+    saveProgress();
   }
 
   // ── PWA 설치 ──────────────────────────────────────
   let deferredPrompt;
   const installBanner = document.getElementById('install-banner');
-  const installBtn    = document.getElementById('install-btn');
-  const dismissBtn    = document.getElementById('dismiss-btn');
 
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
@@ -620,7 +744,7 @@
     installBanner.style.display = 'flex';
   });
 
-  installBtn.addEventListener('click', async () => {
+  document.getElementById('install-btn').addEventListener('click', async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
@@ -629,7 +753,7 @@
     installBanner.style.display = 'none';
   });
 
-  dismissBtn.addEventListener('click', () => {
+  document.getElementById('dismiss-btn').addEventListener('click', () => {
     installBanner.style.display = 'none';
   });
 
@@ -637,6 +761,9 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
+
+  // ── 초기 로드 ─────────────────────────────────────
+  loadSaved();
 </script>
 </body>
 </html>
