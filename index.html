@@ -451,6 +451,52 @@
   let utterance = null;
   let listOpen = false;
 
+  // ── 백그라운드 유지 ────────────────────────────────
+  let audioCtx = null;
+  let silentSource = null;
+
+  function startSilentAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate, audioCtx.sampleRate);
+    function loop() {
+      silentSource = audioCtx.createBufferSource();
+      silentSource.buffer = buf;
+      silentSource.connect(audioCtx.destination);
+      silentSource.start();
+      silentSource.onended = loop;
+    }
+    loop();
+  }
+
+  function stopSilentAudio() {
+    if (silentSource) { try { silentSource.onended = null; silentSource.stop(); } catch {} }
+    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  }
+
+  function setupMediaSession() {
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: '나만의 TTS',
+      artist: '학습 내용 재생 중',
+    });
+    navigator.mediaSession.setActionHandler('play', () => {
+      if (isPaused) { synth.resume(); isPaused = false; setStatus('playing'); pauseBtn.textContent = '⏸ 일시정지'; playBtn.disabled = true; }
+      navigator.mediaSession.playbackState = 'playing';
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      synth.pause(); isPaused = true; setStatus('paused'); pauseBtn.textContent = '▶ 계속'; playBtn.disabled = false;
+      navigator.mediaSession.playbackState = 'paused';
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      if (idx < sentences.length - 1) { synth.cancel(); idx++; speakNext(); }
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      if (idx > 0) { synth.cancel(); idx--; speakNext(); }
+    });
+    navigator.mediaSession.playbackState = 'playing';
+  }
+
   // ── 유틸 ──────────────────────────────────────────
   function showToast(msg) {
     toast.textContent = msg;
@@ -673,6 +719,8 @@
     pauseBtn.textContent = '⏸ 일시정지';
     stopBtn.disabled = false;
     setStatus('playing');
+    startSilentAudio();
+    setupMediaSession();
     speakNext();
   }
 
@@ -717,6 +765,8 @@
 
   function resetPlayer() {
     synth.cancel();
+    stopSilentAudio();
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
     sentences = [];
     idx = 0;
     isPaused = false;

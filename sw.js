@@ -1,4 +1,4 @@
-const CACHE = 'tts-v3';
+const CACHE = 'tts-v4';
 const ASSETS = [
   './',
   './index.html',
